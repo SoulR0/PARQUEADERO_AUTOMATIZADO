@@ -48,3 +48,4 @@ class Tarifa(models.Model):
 
     def __str__(self):
         return f"Tarifa {self.tipo_vehiculo}"
+from django.db import models
