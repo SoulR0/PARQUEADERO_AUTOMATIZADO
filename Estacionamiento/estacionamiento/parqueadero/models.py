@@ -63,6 +63,8 @@ class RegistroParqueo(models.Model):
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     hora_entrada = models.DateTimeField(auto_now_add=True)
     hora_salida = models.DateTimeField(null=True, blank=True)
+    zona = models.ForeignKey(Zona, on_delete=models.PROTECT, null=True, blank=True)
+    notas = models.TextField(blank=True, default='')
     cobro = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     # --- Campos nuevos ---
     empleado_entrada = models.ForeignKey(  # Quién registró la entrada
@@ -95,9 +97,11 @@ class RegistroParqueo(models.Model):
     )
 
     def tiempo_total(self):
-        if self.hora_salida:
+        if self.hora_entrada and self.hora_salida:
             return self.hora_salida - self.hora_entrada
-        return None
+        return "N/A"
+
+
 
     def calcular_cobro(self, tarifa):
         # Lógica para calcular el cobro basado en tarifas y tiempo
@@ -155,22 +159,85 @@ class Reserva(models.Model):
         return f"Reserva {self.id} - {self.vehiculo.placa}"
 
 class Pago(models.Model):
-    registro_parqueo = models.ForeignKey(RegistroParqueo, on_delete=models.CASCADE)
-    monto = models.DecimalField(max_digits=8, decimal_places=2)
-    fecha_pago = models.DateTimeField(auto_now_add=True)
-    metodo_pago = models.CharField(max_length=20, choices=[
+    METODO_PAGO_CHOICES = [
         ('efectivo', 'Efectivo'),
         ('tarjeta', 'Tarjeta'),
         ('transferencia', 'Transferencia'),
-    ])
-    estado = models.CharField(max_length=20, choices=[
+        ('app', 'Aplicación Móvil'),
+    ]
+    
+    ESTADO_CHOICES = [
         ('pendiente', 'Pendiente'),
         ('completado', 'Completado'),
         ('fallido', 'Fallido'),
-    ], default='pendiente')
+        ('reembolsado', 'Reembolsado'),
+    ]
+
+    registro_parqueo = models.ForeignKey(
+        'RegistroParqueo', 
+        on_delete=models.CASCADE,
+        related_name='pagos',
+        verbose_name='Registro de Parqueo'
+    )
+    monto = models.DecimalField(
+        max_digits=10,  # Aumentado a 10 para mayor flexibilidad
+        decimal_places=2,
+        verbose_name='Monto Pagado'
+    )
+    fecha_pago = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de Pago'
+    )
+    metodo_pago = models.CharField(
+        max_length=20,
+        choices=METODO_PAGO_CHOICES,
+        default='efectivo',
+        verbose_name='Método de Pago'
+    )
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default='pendiente',
+        verbose_name='Estado del Pago'
+    )
+    comprobante = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name='Número de Comprobante'
+    )
+    referencia_pago = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Referencia de Pago'
+    )
+    empleado = models.ForeignKey(
+        'Empleado',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Empleado que registró'
+    )
+
+    class Meta:
+        verbose_name = 'Pago'
+        verbose_name_plural = 'Pagos'
+        ordering = ['-fecha_pago']
+        indexes = [
+            models.Index(fields=['fecha_pago']),
+            models.Index(fields=['estado']),
+            models.Index(fields=['metodo_pago']),
+        ]
 
     def __str__(self):
-        return f"Pago {self.id} - {self.monto}"
+        return f"Pago #{self.id} - {self.monto} ({self.get_estado_display()})"
+
+    def save(self, *args, **kwargs):
+        # Validación automática al guardar
+        if self.monto <= 0:
+            raise ValueError("El monto debe ser mayor que cero")
+        super().save(*args, **kwargs)
 
 class Empleado(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

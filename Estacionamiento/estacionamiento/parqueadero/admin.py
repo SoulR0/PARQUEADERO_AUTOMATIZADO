@@ -48,15 +48,16 @@ class VehiculoAdmin(admin.ModelAdmin):
 
 @admin.register(RegistroParqueo)
 class RegistroParqueoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'vehiculo', 'hora_entrada', 'hora_salida', 'estado', 'cobro')
+    list_display = ('id', 'vehiculo', 'hora_entrada', 'hora_salida', 'estado', 'cobro', 'tiempo_total')
     list_filter = ('estado', 'hora_entrada', 'vehiculo__zona_asignada')
     date_hierarchy = 'hora_entrada'
     raw_id_fields = ('vehiculo', 'empleado_entrada', 'empleado_salida')
     readonly_fields = ('tiempo_total',)
 
     def tiempo_total(self, obj):
-        return obj.tiempo_total()
+        return obj.tiempo_total  # <-- SIN paréntesis
     tiempo_total.short_description = 'Tiempo Estacionado'
+
 
 @admin.register(Tarifa)
 class TarifaAdmin(admin.ModelAdmin):
