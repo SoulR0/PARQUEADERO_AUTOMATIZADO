@@ -5,8 +5,78 @@ from django.db.models import Sum, F, Q
 from django.utils import timezone
 from decimal import Decimal
 from .models import Vehiculo, RegistroParqueo, Zona, Pago, Tarifa
-from .forms import RegistroEntradaForm, VehiculoForm, PagoForm
+from .forms import (
+    RegistroEntradaForm, VehiculoForm, PagoForm, ZonaForm, EmpleadoForm, ClienteForm, IngresoForm, FacturaForm, PromocionForm,PropietarioForm
+)
 
+from django.shortcuts import render
+from .forms import PersonaForm  # asegúrate de tener este form
+
+def crear_persona(request):
+    if request.method == 'POST':
+        form = PersonaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_personas')  # asegúrate de tener esa vista/url
+    else:
+        form = PersonaForm()
+    return render(request, 'parqueadero/crear_persona.html', {'form': form})
+
+def crear_empleado(request):
+    form = EmpleadoForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    return render(request, 'empleados/crear_empleado.html', {'form': form})
+
+def crear_cliente(request):
+    form = ClienteForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    return render(request, 'clientes/crear_cliente.html', {'form': form})
+
+def crear_ingreso(request):
+    form = IngresoForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    return render(request, 'ingresos/crear_ingreso.html', {'form': form})
+
+def crear_factura(request):
+    form = FacturaForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    return render(request, 'facturas/crear_factura.html', {'form': form})
+
+def crear_promocion(request):
+    form = PromocionForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    return render(request, 'promociones/crear_promocion.html', {'form': form})
+
+def crear_vehiculo(request):
+    if request.method == 'POST':
+        form = VehiculoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('inicio')  # O adonde quieras redirigir
+    else:
+        form = VehiculoForm()
+    return render(request, 'vehiculos/crear_vehiculo.html', {'form': form})
+
+
+def crear_zona(request):
+    if request.method == 'POST':
+        form = ZonaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_zonas')  # o la vista que prefieras
+    else:
+        form = ZonaForm()
+    return render(request, 'zona/crear_zona.html', {'form': form})
 
 def lista_registros_parqueo(request):
     registros = RegistroParqueo.objects.all().values()  # convierte a diccionario
@@ -271,6 +341,16 @@ def historial_pagos(request):
         for pago in pagos
     ]
     return JsonResponse(data, safe=False)
+
+def crear_propietario(request):
+    if request.method == 'POST':
+        form = PropietarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_propietarios')  # o donde desees redirigir
+    else:
+        form = PropietarioForm()
+    return render(request, 'parqueadero/crear_propietario.html', {'form': form})
 
 def api_historial_registros(request):
     registros = Registro.objects.all().order_by('-hora_entrada')

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Propietario{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Registrar Nuevo Propietario</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

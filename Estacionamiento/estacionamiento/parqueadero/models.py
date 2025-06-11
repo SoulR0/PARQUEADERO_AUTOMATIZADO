@@ -38,6 +38,27 @@ class Zona(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.ubicacion})" if self.ubicacion else self.nombre
 
+class Persona(models.Model):
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    tipo_documento = models.CharField(max_length=20)
+    numero_documento = models.CharField(max_length=20)
+    correo = models.EmailField()
+    telefono = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.nombres} {self.apellidos}"
+
+class Propietario(models.Model):
+    nombres = models.CharField(max_length=100)
+    identificacion = models.CharField(max_length=20)
+    telefono = models.CharField(max_length=20)
+    correo = models.EmailField()
+    direccion = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.nombres
+
 class Vehiculo(models.Model):
     placa = models.CharField(max_length=10, unique=True)
     tipo = models.CharField(max_length=20, choices=TIPOS_VEHICULO)
@@ -297,5 +318,14 @@ class ConfiguracionSistema(models.Model):
     def __str__(self):
         return self.nombre_estacionamiento
 
+from django.db import models
+
+class Ingreso(models.Model):
+    fecha_hora_ingreso = models.DateTimeField()
+    vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
+    zona = models.ForeignKey('Zona', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.vehiculo} ingresó el {self.fecha_hora_ingreso}"
 
 from django.db import models

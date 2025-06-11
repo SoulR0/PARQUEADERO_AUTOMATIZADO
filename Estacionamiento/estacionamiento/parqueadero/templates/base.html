@@ -13,6 +13,18 @@
     {% include 'partials/_navigation.html' %}
 
     <main class="container mt-4">
+        <!-- 🔘 Botones de acceso rápido -->
+        <div class="d-flex flex-wrap gap-2 justify-content-end mb-4">
+            <a href="{% url 'crear_persona' %}" class="btn btn-outline-primary">➕ Persona</a>
+            <a href="{% url 'crear_empleado' %}" class="btn btn-outline-primary">➕ Empleado</a>
+            <a href="{% url 'crear_propietario' %}" class="btn btn-outline-primary">➕ Propietario</a>
+            <a href="{% url 'crear_vehiculo' %}" class="btn btn-outline-primary">➕ Vehículo</a>
+            <a href="{% url 'crear_zona' %}" class="btn btn-outline-primary">➕ Zona</a>
+            <a href="{% url 'crear_promocion' %}" class="btn btn-outline-primary">➕ Promoción</a>
+            <a href="{% url 'crear_factura' %}" class="btn btn-outline-primary">➕ Factura</a>
+            <a href="{% url 'crear_ingreso' %}" class="btn btn-outline-primary">➕ Ingreso</a>
+        </div>
+ 
         {% block content %}{% endblock %}
     </main>
 

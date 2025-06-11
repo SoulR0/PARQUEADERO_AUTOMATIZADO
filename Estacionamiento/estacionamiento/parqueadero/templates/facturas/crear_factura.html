@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Factura{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Crear Nueva Factura</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar Factura</button>
+    </form>
+</div>
+{% endblock %}
