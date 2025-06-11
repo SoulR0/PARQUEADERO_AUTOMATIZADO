@@ -1,0 +1,41 @@
+/* Estilos base */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar personalizada */
+.navbar-brand {
+    font-weight: 700;
+}
+
+/* Tarjetas de dashboard */
+.card {
+    border-radius: 0.5rem;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Tablas */
+#dataTable {
+    font-size: 0.9rem;
+}
+
+/* Formularios */
+.needs-validation .form-control:valid {
+    border-color: #28a745;
+}
+
+.needs-validation .form-control:invalid {
+    border-color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4">Dashboard del Parqueadero</h1>
+    
+    <div class="row mt-4">
+        <!-- Tarjeta de Ocupación -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Ocupación Actual</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ ocupacion_total }}/{{ capacidad_total }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-car fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tarjeta de Ingresos Hoy -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ingresos Hoy</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                ${{ ingresos_hoy|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabla de Vehículos Estacionados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Vehículos Actualmente Estacionados</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Tipo</th>
+                            <th>Zona</th>
+                            <th>Hora Entrada</th>
+                            <th>Tiempo Transcurrido</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in registros_activos %}
+                        <tr>
+                            <td>{{ registro.vehiculo.placa }}</td>
+                            <td>{{ registro.vehiculo.get_tipo_display }}</td>
+                            <td>{{ registro.zona.nombre }}</td>
+                            <td>{{ registro.hora_entrada|date:"H:i" }}</td>
+                            <td>{{ registro.tiempo_transcurrido }}</td>
+                            <td>
+                                <a href="{% url 'registrar_salida' registro.id %}" 
+                                   class="btn btn-sm btn-danger">
+                                    Registrar Salida
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

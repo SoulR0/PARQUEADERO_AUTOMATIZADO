@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h2 class="mb-4">Registro de Entrada</h2>
+        
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="placa" class="form-label">Placa del Vehículo</label>
+                <input type="text" class="form-control" id="placa" name="placa" 
+                       pattern="[A-Za-z]{3}-?\d{3,4}" required>
+                <div class="invalid-feedback">
+                    Ingrese una placa válida (ABC-123 o ABC123)
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="tipo_vehiculo" class="form-label">Tipo de Vehículo</label>
+                    <select class="form-select" id="tipo_vehiculo" name="tipo_vehiculo" required>
+                        <option value="" selected disabled>Seleccione...</option>
+                        <option value="carro">Automóvil</option>
+                        <option value="moto">Motocicleta</option>
+                        <option value="discapacitado">Discapacitado</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="zona" class="form-label">Zona de Parqueo</label>
+                    <select class="form-select" id="zona" name="zona" required>
+                        <option value="" selected disabled>Seleccione...</option>
+                        {% for zona in zonas_disponibles %}
+                        <option value="{{ zona.id }}">{{ zona.nombre }} ({{ zona.ocupados }}/{{ zona.capacidad }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Registrar Entrada</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

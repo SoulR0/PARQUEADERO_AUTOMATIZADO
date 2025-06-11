@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-car me-2"></i>Registro de Entrada</h2>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post" id="registroForm" autocomplete="off">
+                {% csrf_token %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Vehículo</label>
+                        {{ form.vehiculo }}
+                        {% if form.vehiculo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.vehiculo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Zona de Estacionamiento</label>
+                        {{ form.zona }}
+                        <small class="text-muted">Lugares disponibles: 
+                            <span id="disponibles">-</span>
+                        </small>
+                        {% if form.zona.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.zona.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Notas/Observaciones</label>
+                    {{ form.notas }}
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Registrar Entrada
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Panel de información en tiempo real -->
+    <div class="card shadow mt-4">
+        <div class="card-header bg-info text-white">
+            <i class="fas fa-info-circle me-1"></i> Información Actual
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Hora Actual:</strong> <span id="currentTime">{{ current_time }}</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Empleado:</strong> {{ request.user.get_full_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Actualizar hora cada minuto
+    function updateTime() {
+        $.get("/api/current-time/", function(data) {
+            $('#currentTime').text(data.time);
+        });
+    }
+    setInterval(updateTime, 60000);
+    
+    // Dinámica de zonas
+    $('#id_zona').change(function() {
+        const zonaId = $(this).val();
+        if (zonaId) {
+            $.get(`/api/zonas/${zonaId}/`, function(data) {
+                $('#disponibles').text(data.disponibles);
+            });
+        }
+    }).trigger('change');
+});
+</script>
+{% endblock %}
