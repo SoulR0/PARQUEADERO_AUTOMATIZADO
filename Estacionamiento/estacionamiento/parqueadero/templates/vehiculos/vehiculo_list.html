@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Lista de Vehículos</h1>
+<table border="1">
+  <tr>
+    <th>Placa</th>
+    <th>Tipo</th>
+    <th>Espacio</th>
+    <th>Zona</th>
+    <th>Cliente</th>
+  </tr>
+  {% for vehiculo in vehiculos %}
+  <tr>
+    <td>{{ vehiculo.placa }}</td>
+    <td>{{ vehiculo.tipo }}</td>
+    <td>{{ vehiculo.espacio.numero }}</td>
+    <td>{{ vehiculo.zona_asignada.nombre }}</td>
+    <td>{{ vehiculo.cliente.nombre }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

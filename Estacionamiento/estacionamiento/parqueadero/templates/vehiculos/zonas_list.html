@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Zonas</h1>
+<ul>
+  {% for zona in zonas %}
+    <li>{{ zona.nombre }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
