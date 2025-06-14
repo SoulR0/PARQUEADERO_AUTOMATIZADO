@@ -101,6 +101,7 @@ from django.utils import timezone
 from decimal import Decimal
 from django.db.models import Sum, F
 from django.shortcuts import render
+from django.http import JsonResponse, Http404
 from .models import RegistroParqueo, Zona, Pago
 
 def dashboard(request):
@@ -280,6 +281,7 @@ def crear_pago(request, registro_id):
         'registro': registro
     })
 
+#correccion en esta parte yair quintana
 def detalle_zona(request, zona_id):
     try:
         zona = Zona.objects.get(pk=zona_id)
@@ -352,8 +354,10 @@ def crear_propietario(request):
         form = PropietarioForm()
     return render(request, 'parqueadero/crear_propietario.html', {'form': form})
 
+#correccion en esta parte yair quintana
 def api_historial_registros(request):
-    registros = Registro.objects.all().order_by('-hora_entrada')
+    registros = RegistroParqueo.objects.all().order_by('-hora_entrada')
+
     data = [
         {
             'id': registro.id,
