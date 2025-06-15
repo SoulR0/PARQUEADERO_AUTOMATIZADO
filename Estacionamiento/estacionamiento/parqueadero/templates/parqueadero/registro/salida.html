@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Confirmar Salida de Vehículo</h2>
+    
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ registro.vehiculo.placa }}</h5>
+            <div class="mb-3">
+                <p><strong>Tipo:</strong> {{ registro.vehiculo.get_tipo_display }}</p>
+                <p><strong>Zona:</strong> {{ registro.zona.nombre|default:"-" }}</p>
+                <p><strong>Hora entrada:</strong> {{ registro.hora_entrada|date:"H:i" }}</p>
+                <p><strong>Tiempo estacionado:</strong> {{ tiempo_estacionado }}</p>
+                <p><strong>Cobro estimado:</strong> ${{ cobro_estimado|floatformat:2 }}</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Confirmar Salida
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

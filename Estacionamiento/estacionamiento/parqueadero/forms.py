@@ -49,6 +49,10 @@ class ZonaForm(forms.ModelForm):
     class Meta:
         model = Zona
         fields = '__all__'
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'capacidad': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
 class VehiculoForm(forms.ModelForm):
     class Meta:

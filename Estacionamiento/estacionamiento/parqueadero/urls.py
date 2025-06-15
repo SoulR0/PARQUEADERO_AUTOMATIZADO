@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from .views import (
     crear_zona, crear_vehiculo, crear_empleado, crear_cliente,
-     crear_ingreso, crear_factura, crear_promocion,crear_persona
+    crear_ingreso, crear_factura, crear_promocion,crear_persona
 )
 
 urlpatterns = [
@@ -45,6 +45,10 @@ urlpatterns = [
     path('promociones/nueva/', crear_promocion, name='crear_promocion'),
     path('personas/nueva/', crear_persona, name='crear_persona'),
     path('propietarios/crear/', views.crear_propietario, name='crear_propietario'),
+    path('personas/', views.listar_personas, name='listar_personas'),
+    path('personas/editar/<int:id>/', views.editar_persona, name='editar_persona'),
+    path('personas/eliminar/<int:id>/', views.eliminar_persona, name='eliminar_persona'),
+
 ]
 
 
