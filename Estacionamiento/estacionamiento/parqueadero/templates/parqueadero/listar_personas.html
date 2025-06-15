@@ -1,0 +1,41 @@
+{% extends 'base.html' %}  <!-- Si tienes una plantilla base -->
+
+{% block content %}
+<h2>Listado de Personas</h2>
+
+<a href="{% url 'crear_persona' %}" class="btn btn-primary">Nueva Persona</a>  <!-- Botón para crear nueva persona -->
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Tipo Documento</th>
+            <th>Número Documento</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for persona in personas %}
+        <tr>
+            <td>{{ persona.nombres }}</td>
+            <td>{{ persona.apellidos }}</td>
+            <td>{{ persona.tipo_documento }}</td>
+            <td>{{ persona.numero_documento }}</td>
+            <td>{{ persona.correo }}</td>
+            <td>{{ persona.telefono }}</td>
+            <td>
+                <a href="{% url 'editar_persona' persona.id %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'eliminar_persona' persona.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center">No hay personas registradas</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

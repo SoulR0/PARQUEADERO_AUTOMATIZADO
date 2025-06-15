@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 TIPOS_VEHICULO = [
     ('carro', 'Carro'),
@@ -88,6 +89,20 @@ class RegistroParqueo(models.Model):
     notas = models.TextField(blank=True, default='')
     cobro = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     # --- Campos nuevos ---
+    
+    @property
+    def tiempo_transcurrido(self):
+        """Calcula el tiempo transcurrido desde la entrada"""
+        if self.hora_salida:
+            delta = self.hora_salida - self.hora_entrada
+        else:
+            delta = timezone.now() - self.hora_entrada
+        
+        # Formatea el timedelta a un string legible
+        hours, remainder = divmod(delta.total_seconds(), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{int(hours)}h {int(minutes)}m"
+    
     empleado_entrada = models.ForeignKey(  # Quién registró la entrada
         'Empleado',  # Asume que crearás el modelo Empleado
         on_delete=models.SET_NULL,
@@ -121,13 +136,23 @@ class RegistroParqueo(models.Model):
         if self.hora_entrada and self.hora_salida:
             return self.hora_salida - self.hora_entrada
         return "N/A"
-
-
-
-    def calcular_cobro(self, tarifa):
-        # Lógica para calcular el cobro basado en tarifas y tiempo
-        pass
-
+    
+    def calcular_cobro(self, tarifa_hora=None):
+    # Si no se proporciona tarifa_hora, usa una por defecto o de la zona
+        if tarifa_hora is None:
+            tarifa_hora = 10.00  # Valor por defecto o self.zona.tarifa_hora si existe
+    
+        if self.hora_salida:
+            delta = self.hora_salida - self.hora_entrada
+        
+        else:
+            delta = timezone.now() - self.hora_entrada
+            
+        horas = delta.total_seconds() / 3600
+        # Redondea hacia arriba (cobrar por horas completas)
+        horas = int(horas) + (1 if delta.seconds % 3600 > 0 else 0)
+        return round(horas * tarifa_hora, 2)
+    
     def __str__(self):
         return f"Registro #{self.id} - {self.vehiculo.placa}"
 

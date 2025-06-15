@@ -3,7 +3,10 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.db.models import Sum, F, Q
 from django.utils import timezone
+from datetime import timedelta
+from .models import Persona  # Importa el modelo Persona desde tu aplicación
 from decimal import Decimal
+from .models import RegistroParqueo
 from .models import Vehiculo, RegistroParqueo, Zona, Pago, Tarifa
 from .forms import (
     RegistroEntradaForm, VehiculoForm, PagoForm, ZonaForm, EmpleadoForm, ClienteForm, IngresoForm, FacturaForm, PromocionForm,PropietarioForm
@@ -73,7 +76,10 @@ def crear_zona(request):
         form = ZonaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_zonas')  # o la vista que prefieras
+            messages.success(request, 'Zona creada exitosamente')
+            return redirect('lista_zonas')  # Asegúrate de definir esta URL
+        else:
+            messages.error(request, 'Hubo errores en el formulario')
     else:
         form = ZonaForm()
     return render(request, 'zona/crear_zona.html', {'form': form})
@@ -132,9 +138,6 @@ def dashboard(request):
     }
     return render(request, 'parqueadero/dashboard.html', context)
 
-
-
-
 def agregar_vehiculo(request):
     if request.method == 'POST':
         form = VehiculoForm(request.POST)
@@ -146,7 +149,6 @@ def agregar_vehiculo(request):
         form = VehiculoForm()
 
     return render(request, 'parqueadero/vehiculos/agregar.html', {'form': form})
-
 
 def registro_entrada(request):
     """
@@ -218,25 +220,33 @@ def registrar_salida(request, registro_id):
     """Registro de salida de vehículos"""
     registro = get_object_or_404(RegistroParqueo, id=registro_id, estado='activo')
     
+    # Define la tarifa (puedes obtenerla de la zona o usar un valor fijo)
+    tarifa_hora = 5000.00
+
     if request.method == 'POST':
+        # Registrar la salida
         registro.hora_salida = timezone.now()
         registro.empleado_salida = request.user.empleado
         registro.estado = 'pendiente_pago'
-        registro.calcular_cobro()
-        registro.save()
+        registro.cobro = registro.calcular_cobro()  # Usa el método del modelo
         
         # Liberar espacio en la zona
         if registro.zona:
             registro.zona.ocupados = F('ocupados') - 1
             registro.zona.save()
         
+        registro.save()
         messages.success(request, 'Salida registrada correctamente')
         return redirect('dashboard')
     
-    return render(request, 'parqueadero/registro/salida.html', {
+    # Para GET: mostrar formulario de confirmación
+    tiempo_estacionado = timezone.now() - registro.hora_entrada
+    context = {
         'registro': registro,
-        'tiempo_estacionado': registro.tiempo_transcurrido
-    })
+        'tiempo_estacionado': str(tiempo_estacionado).split('.')[0],
+        'cobro_estimado': registro.calcular_cobro(),  # Usa el método del modelo
+    }
+    return render(request, 'parqueadero/registro/salida.html', context)
 
 def gestion_pagos(request):
     """Gestión de pagos pendientes"""
@@ -366,3 +376,41 @@ def api_historial_registros(request):
         for registro in registros
     ]
     return JsonResponse(data, safe=False)
+
+def listar_personas(request):
+    personas = Persona.objects.all().order_by('apellidos')  # Ordenadas por apellido
+    return render(request, 'parqueadero/listar_personas.html', {'personas': personas})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Persona
+from .forms import PersonaForm  # Asumiendo que tienes un Form para Persona
+
+def editar_persona(request, id):
+    persona = get_object_or_404(Persona, id=id)
+    if request.method == 'POST':
+        form = PersonaForm(request.POST, instance=persona)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_personas')
+    else:
+        form = PersonaForm(instance=persona)
+    return render(request, 'parqueadero/editar_persona.html', {'form': form}) 
+
+def eliminar_persona(request, id):
+    persona = get_object_or_404(Persona, id=id)
+    if request.method == 'POST':
+        persona.delete()
+        return redirect('listar_personas')
+    return render(request, 'parqueadero/eliminar_persona.html', {'persona': persona})
+
+def calcular_cobro(self, tarifa_hora):
+    """Calcula el cobro basado en el tiempo estacionado"""
+    if self.hora_salida:
+        delta = self.hora_salida - self.hora_entrada
+    else:
+        delta = timezone.now() - self.hora_entrada
+    
+    horas = delta.total_seconds() / 3600
+    # Redondea hacia arriba (cobrar por horas completas)
+    horas = int(horas) + (1 if delta.seconds % 3600 > 0 else 0)
+    return round(horas * tarifa_hora, 2)
