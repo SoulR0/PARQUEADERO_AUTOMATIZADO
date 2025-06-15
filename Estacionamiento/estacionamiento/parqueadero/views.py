@@ -15,6 +15,7 @@ from .forms import (
 from django.shortcuts import render
 from .forms import PersonaForm  # asegúrate de tener este form
 
+
 def crear_persona(request):
     if request.method == 'POST':
         form = PersonaForm(request.POST)
@@ -25,12 +26,14 @@ def crear_persona(request):
         form = PersonaForm()
     return render(request, 'parqueadero/crear_persona.html', {'form': form})
 
+
 def crear_empleado(request):
     form = EmpleadoForm(request.POST or None)
     if form.is_valid():
         form.save()
         return redirect('/')
     return render(request, 'empleados/crear_empleado.html', {'form': form})
+
 
 def crear_cliente(request):
     form = ClienteForm(request.POST or None)

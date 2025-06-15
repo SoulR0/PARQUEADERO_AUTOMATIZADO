@@ -19,6 +19,7 @@ class Zona(models.Model):
     capacidad = models.PositiveIntegerField()
     ocupados = models.PositiveIntegerField(default=0)
     # --- Campos nuevos ---
+    
     ubicacion = models.CharField(  # Ej: "Piso 1", "Sótano B"
         max_length=50,
         blank=True,
@@ -32,6 +33,7 @@ class Zona(models.Model):
         blank=True
     )
     habilitada = models.BooleanField(default=True)  # Para desactivar zonas en mantenimiento
+
 
     def espacios_disponibles(self):
         return self.capacidad - self.ocupados

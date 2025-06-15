@@ -7,6 +7,7 @@ class ClienteForm(forms.ModelForm):
         model = Cliente
         fields = '__all__'
 
+
 class PersonaForm(forms.ModelForm):
     class Meta:
         model = Persona
@@ -24,6 +25,7 @@ class PropietarioForm(forms.ModelForm):
     class Meta:
         model = Propietario
         fields = '__all__'
+
 
 class IngresoForm(forms.ModelForm):
     class Meta:

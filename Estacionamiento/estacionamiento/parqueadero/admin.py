@@ -26,6 +26,7 @@ class ZonaAdmin(admin.ModelAdmin):
         queryset.update(habilitada=False)
     deshabilitar_zonas.short_description = "Deshabilitar zonas seleccionadas"
 
+
 @admin.register(Vehiculo)
 class VehiculoAdmin(admin.ModelAdmin):
     list_display = ('placa', 'tipo', 'marca', 'modelo', 'color', 'cliente', 'zona_asignada')
@@ -33,6 +34,7 @@ class VehiculoAdmin(admin.ModelAdmin):
     search_fields = ('placa', 'cliente__user__username', 'marca', 'modelo')
     autocomplete_fields = ('cliente', 'zona_asignada')
     readonly_fields = ('fecha_registro',)
+
 
     fieldsets = (
         ('Información Básica', {
@@ -47,6 +49,7 @@ class VehiculoAdmin(admin.ModelAdmin):
         })
     )
 
+
 @admin.register(RegistroParqueo)
 class RegistroParqueoAdmin(admin.ModelAdmin):
     list_display = ('id', 'vehiculo', 'hora_entrada', 'hora_salida', 'estado', 'cobro', 'tiempo_total')
@@ -54,6 +57,7 @@ class RegistroParqueoAdmin(admin.ModelAdmin):
     date_hierarchy = 'hora_entrada'
     raw_id_fields = ('vehiculo', 'empleado_entrada', 'empleado_salida')
     readonly_fields = ('tiempo_total',)
+
 
     def tiempo_total(self, obj):
         return obj.tiempo_total  # <-- SIN paréntesis
