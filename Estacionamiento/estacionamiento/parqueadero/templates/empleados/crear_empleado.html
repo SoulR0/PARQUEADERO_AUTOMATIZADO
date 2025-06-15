@@ -5,6 +5,7 @@
 {% block content %}
 <h2 class="mb-4">Registrar Nuevo Empleado</h2>
 
+
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
